@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="Interface" name="InterfaceProcess" isExecutable="true">
+    <documentation>申请流程</documentation>
+    <startEvent id="start" name="开始"></startEvent>
+    <userTask id="fillTask" name="接口申请"></userTask>
+    <userTask id="directorTak" name="管理员审批" flowable:assignee="${userId}"></userTask>
+    <endEvent id="end" name="结束"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="fillTask"></sequenceFlow>
+    <exclusiveGateway id="sid-C5A5F08C-FEE9-486F-9F6B-DC0D3DB9DDF2"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="fillTask" targetRef="directorTak"></sequenceFlow>
+    <sequenceFlow id="sid-7BEDE446-4E7D-4B37-959B-D39E4D1CBED3" sourceRef="directorTak" targetRef="sid-C5A5F08C-FEE9-486F-9F6B-DC0D3DB9DDF2"></sequenceFlow>
+    <sequenceFlow id="directorPassFlow" name="通过" sourceRef="sid-C5A5F08C-FEE9-486F-9F6B-DC0D3DB9DDF2" targetRef="end">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approve=='1'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="directorNotPassFlow" name="驳回" sourceRef="sid-C5A5F08C-FEE9-486F-9F6B-DC0D3DB9DDF2" targetRef="fillTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approve=='2'}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Interface">
+    <bpmndi:BPMNPlane bpmnElement="Interface" id="BPMNPlane_Interface">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="fillTask" id="BPMNShape_fillTask">
+        <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="directorTak" id="BPMNShape_directorTak">
+        <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-C5A5F08C-FEE9-486F-9F6B-DC0D3DB9DDF2" id="BPMNShape_sid-C5A5F08C-FEE9-486F-9F6B-DC0D3DB9DDF2">
+        <omgdc:Bounds height="0.0" width="0.0" x="0.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="79.9492178302229" y="202.1520266507013"></omgdi:waypoint>
+        <omgdi:waypoint x="309.99999999999886" y="204.4915254237288"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="409.94999999991427" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="205.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-7BEDE446-4E7D-4B37-959B-D39E4D1CBED3" id="BPMNEdge_sid-7BEDE446-4E7D-4B37-959B-D39E4D1CBED3">
+        <omgdi:waypoint x="654.9499999999999" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="765.0" y="205.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="directorNotPassFlow" id="BPMNEdge_directorNotPassFlow">
+        <omgdi:waypoint x="787.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="787.0" y="37.0"></omgdi:waypoint>
+        <omgdi:waypoint x="359.0" y="37.0"></omgdi:waypoint>
+        <omgdi:waypoint x="359.76190476190476" y="165.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="directorPassFlow" id="BPMNEdge_directorPassFlow">
+        <omgdi:waypoint x="785.0638099211054" y="224.88417540341024"></omgdi:waypoint>
+        <omgdi:waypoint x="785.0054256224342" y="375.00000174824424"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

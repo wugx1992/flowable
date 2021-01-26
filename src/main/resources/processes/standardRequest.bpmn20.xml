@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="bap">
+    <process id="standardRequest" name="标准申请流程" isExecutable="true">
+        <startEvent id="startEvent" name="创建申请"></startEvent>
+        <sequenceFlow id="sequenceFlow-862d75bf-2468-4957-b26a-8c9823770ac4" sourceRef="startEvent" targetRef="assignToAuditor"></sequenceFlow>
+        <serviceTask id="assignToAuditor" name="分配审批人" flowable:class="com.example.flowable.delegate.AssignToAuditorDelegate"></serviceTask>
+        <sequenceFlow id="sequenceFlow-84927229-c86d-47fb-b035-2a735913d3ef" sourceRef="assignToAuditor" targetRef="auditorExist"></sequenceFlow>
+        <exclusiveGateway id="auditorExist" name="审批人是否存在" default="auditorNotExistFlow"></exclusiveGateway>
+        <sequenceFlow id="sequenceFlow-92a43280-35db-456c-9d74-94b0ca8c5382" sourceRef="auditorExist" targetRef="approveTask">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${auditMethod.existAuditor(execution)}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="auditorNotExistFlow" sourceRef="auditorExist" targetRef="agreeDelegate"></sequenceFlow>
+        <userTask id="approveTask" name="等待审批" flowable:candidateUsers="${auditMethod.getCandidateUsers(execution)}" flowable:candidateGroups="${auditMethod.getCandidateGroups(execution)}"></userTask>
+        <sequenceFlow id="sequenceFlow-a58bf9e9-f576-42e8-a2f9-d26c70251edf" sourceRef="approveTask" targetRef="decision"></sequenceFlow>
+        <exclusiveGateway id="decision" default="rejectFlow"></exclusiveGateway>
+        <sequenceFlow id="rejectFlow" sourceRef="decision" targetRef="rejectDelegate"></sequenceFlow>
+        <serviceTask id="agreeDelegate" name="数据存储" flowable:class="com.example.flowable.delegate.StandardRequestAgreeDelegate"></serviceTask>
+        <sequenceFlow id="sequenceFlow-c5d241c8-02c9-49bb-b238-a0acb82457ad" sourceRef="agreeDelegate" targetRef="approveEnd"></sequenceFlow>
+        <serviceTask id="rejectDelegate" name="回复拒绝消息" flowable:class="com.example.flowable.delegate.BaseRejectDelegate"></serviceTask>
+        <sequenceFlow id="sequenceFlow-2ff39eb4-ce1e-4354-b317-ea93149a35f1" sourceRef="rejectDelegate" targetRef="rejectEnd"></sequenceFlow>
+        <endEvent id="approveEnd" name="已同意"></endEvent>
+        <endEvent id="rejectEnd" name="已驳回"></endEvent>
+        <sequenceFlow id="sequenceFlow-cf191d6b-6835-4e12-93ba-73b5b7f218d1" sourceRef="decision" targetRef="assignToAuditor">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${auditMethod.isApproved(execution)}]]></conditionExpression>
+        </sequenceFlow>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_standardRequest">
+        <bpmndi:BPMNPlane bpmnElement="standardRequest" id="BPMNPlane_standardRequest">
+            <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+                <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="175.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="assignToAuditor" id="BPMNShape_assignToAuditor">
+                <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="160.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="auditorExist" id="BPMNShape_auditorExist">
+                <omgdc:Bounds height="40.0" width="40.0" x="230.0" y="114.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="approveTask" id="BPMNShape_approveTask">
+                <omgdc:Bounds height="60.0" width="100.0" x="320.0" y="160.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="decision" id="BPMNShape_decision">
+                <omgdc:Bounds height="40.0" width="40.0" x="470.0" y="232.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="agreeDelegate" id="BPMNShape_agreeDelegate">
+                <omgdc:Bounds height="60.0" width="100.0" x="320.0" y="0.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="rejectDelegate" id="BPMNShape_rejectDelegate">
+                <omgdc:Bounds height="60.0" width="100.0" x="555.0" y="222.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="approveEnd" id="BPMNShape_approveEnd">
+                <omgdc:Bounds height="28.0" width="28.0" x="475.0" y="15.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="rejectEnd" id="BPMNShape_rejectEnd">
+                <omgdc:Bounds height="28.0" width="28.0" x="705.0" y="237.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow-2ff39eb4-ce1e-4354-b317-ea93149a35f1" id="BPMNEdge_sequenceFlow-2ff39eb4-ce1e-4354-b317-ea93149a35f1">
+                <omgdi:waypoint x="654.9499999999977" y="251.56140350877192"></omgdi:waypoint>
+                <omgdi:waypoint x="705.0005248012809" y="251.12236392912962"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow-84927229-c86d-47fb-b035-2a735913d3ef" id="BPMNEdge_sequenceFlow-84927229-c86d-47fb-b035-2a735913d3ef">
+                <omgdi:waypoint x="179.94999999998382" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="192.0" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="192.0" y="134.0"></omgdi:waypoint>
+                <omgdi:waypoint x="230.0" y="134.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow-a58bf9e9-f576-42e8-a2f9-d26c70251edf" id="BPMNEdge_sequenceFlow-a58bf9e9-f576-42e8-a2f9-d26c70251edf">
+                <omgdi:waypoint x="419.9499999999838" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="432.0" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="432.0" y="252.0"></omgdi:waypoint>
+                <omgdi:waypoint x="470.0" y="252.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow-862d75bf-2468-4957-b26a-8c9823770ac4" id="BPMNEdge_sequenceFlow-862d75bf-2468-4957-b26a-8c9823770ac4">
+                <omgdi:waypoint x="29.949998618355412" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="80.0" y="190.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="rejectFlow" id="BPMNEdge_rejectFlow">
+                <omgdi:waypoint x="509.94133362293655" y="252.0"></omgdi:waypoint>
+                <omgdi:waypoint x="555.0" y="252.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="auditorNotExistFlow" id="BPMNEdge_auditorNotExistFlow">
+                <omgdi:waypoint x="269.9189252336448" y="134.0"></omgdi:waypoint>
+                <omgdi:waypoint x="282.0" y="134.0"></omgdi:waypoint>
+                <omgdi:waypoint x="282.0" y="30.000000000000007"></omgdi:waypoint>
+                <omgdi:waypoint x="319.99999999999045" y="30.000000000000007"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow-c5d241c8-02c9-49bb-b238-a0acb82457ad" id="BPMNEdge_sequenceFlow-c5d241c8-02c9-49bb-b238-a0acb82457ad">
+                <omgdi:waypoint x="419.95000000000005" y="30.0"></omgdi:waypoint>
+                <omgdi:waypoint x="432.0" y="30.0"></omgdi:waypoint>
+                <omgdi:waypoint x="432.0" y="30.0"></omgdi:waypoint>
+                <omgdi:waypoint x="475.0021085173268" y="29.24469997080383"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow-92a43280-35db-456c-9d74-94b0ca8c5382" id="BPMNEdge_sequenceFlow-92a43280-35db-456c-9d74-94b0ca8c5382">
+                <omgdi:waypoint x="269.9189252336448" y="134.0"></omgdi:waypoint>
+                <omgdi:waypoint x="282.0" y="134.0"></omgdi:waypoint>
+                <omgdi:waypoint x="282.0" y="190.0"></omgdi:waypoint>
+                <omgdi:waypoint x="320.0" y="190.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow-cf191d6b-6835-4e12-93ba-73b5b7f218d1" id="BPMNEdge_sequenceFlow-cf191d6b-6835-4e12-93ba-73b5b7f218d1">
+                <omgdi:waypoint x="470.0" y="252.0"></omgdi:waypoint>
+                <omgdi:waypoint x="458.0" y="252.0"></omgdi:waypoint>
+                <omgdi:waypoint x="458.0" y="318.0"></omgdi:waypoint>
+                <omgdi:waypoint x="130.0" y="318.0"></omgdi:waypoint>
+                <omgdi:waypoint x="130.0" y="219.95000000000002"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>
