@@ -250,13 +250,16 @@
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
               <stringProp name="Argument.value">{&#xd;
 	&quot;createUserId&quot;: 1,&#xd;
-	&quot;processInstanceKey&quot;: &quot;flow-group-test&quot;,&#xd;
+	&quot;processInstanceKey&quot;: &quot;flowable-skip&quot;,&#xd;
+	&quot;businessKey&quot;: &quot;BK001&quot;,&#xd;
 	&quot;variables&quot;: {&#xd;
 		&quot;amount&quot;: 4000,&#xd;
 		&quot;title&quot;: &quot;费用报销审批&quot;,&#xd;
 		&quot;assigneeUserId&quot;: 1,&#xd;
 		&quot;candidateAGroupId&quot;: &quot;manager02&quot;,&#xd;
-		&quot;candidateBGroupId&quot;: &quot;manager03&quot;&#xd;
+		&quot;candidateBGroupId&quot;: &quot;manager03&quot;,&#xd;
+		&quot;carbonCopyUsers&quot;: &quot;1&quot;,&#xd;
+		&quot;carbonCopyGroups&quot;: &quot;ccGroup&quot;&#xd;
 	}&#xd;
 }</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
@@ -305,13 +308,16 @@
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
               <stringProp name="Argument.value">{&#xd;
 	&quot;createUserId&quot;: 1,&#xd;
-	&quot;processInstanceKey&quot;: &quot;flow-group-test&quot;,&#xd;
+	&quot;processInstanceKey&quot;: &quot;flow-group-test2&quot;,&#xd;
+	&quot;businessKey&quot;: &quot;BK001&quot;,&#xd;
 	&quot;variables&quot;: {&#xd;
 		&quot;amount&quot;: 4000,&#xd;
 		&quot;title&quot;: &quot;费用报销审批&quot;,&#xd;
 		&quot;assigneeUserId&quot;: 1,&#xd;
 		&quot;candidateAGroupId&quot;: &quot;manager02&quot;,&#xd;
-		&quot;candidateBGroupId&quot;: &quot;manager03&quot;&#xd;
+		&quot;candidateBGroupId&quot;: &quot;manager03&quot;,&#xd;
+		&quot;carbonCopyUsers&quot;: &quot;4&quot;,&#xd;
+		&quot;carbonCopyGroups&quot;: &quot;manager04&quot;&#xd;
 	}&#xd;
 }</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
@@ -352,12 +358,12 @@
         </HeaderManager>
         <hashTree/>
       </hashTree>
-      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-获取用户的任务" enabled="true">
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-获取用户的任务" enabled="false">
         <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量" enabled="true">
           <collectionProp name="Arguments.arguments">
             <elementProp name="userId" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value"></stringProp>
+              <stringProp name="Argument.value">4</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">userId</stringProp>
@@ -401,17 +407,45 @@
         </HeaderManager>
         <hashTree/>
       </hashTree>
-      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-审批" enabled="true">
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-查看流程详情" enabled="true">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="instanceId" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">993b3997-6152-11eb-b288-dc4a3e8b7b0b</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">instanceId</stringProp>
+            </elementProp>
+          </collectionProp>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">localhost</stringProp>
+        <stringProp name="HTTPSampler.port">9200</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+        <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        <stringProp name="HTTPSampler.protocol"></stringProp>
+        <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+        <stringProp name="HTTPSampler.path">/common/queryInstanceDetail</stringProp>
+        <stringProp name="HTTPSampler.method">POST</stringProp>
+        <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+        <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+        <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+        <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+        <boolProp name="HTTPSampler.monitor">false</boolProp>
+        <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+      </HTTPSamplerProxy>
+      <hashTree/>
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-审批" enabled="false">
         <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
         <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
           <collectionProp name="Arguments.arguments">
             <elementProp name="" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
               <stringProp name="Argument.value">{&#xd;
-	&quot;taskId&quot;: &quot;5f4e4a21-5fa9-11eb-b754-dc4a3e8b7b0b&quot;,&#xd;
+	&quot;taskId&quot;: &quot;78686788-6153-11eb-bd2a-dc4a3e8b7b0b&quot;,&#xd;
 	&quot;variables&quot;: {&#xd;
 		&quot;approve&quot;: true,&#xd;
-		&quot;variable1&quot;: &quot;任务变量02&quot;&#xd;
+		&quot;variable2&quot;: &quot;任务变量12&quot;&#xd;
 	}&#xd;
 }</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
@@ -425,57 +459,6 @@
         <stringProp name="HTTPSampler.protocol"></stringProp>
         <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
         <stringProp name="HTTPSampler.path">/common/handle</stringProp>
-        <stringProp name="HTTPSampler.method">POST</stringProp>
-        <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-        <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-        <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-        <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-        <boolProp name="HTTPSampler.monitor">false</boolProp>
-        <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-      </HTTPSamplerProxy>
-      <hashTree>
-        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP信息头管理器" enabled="true">
-          <collectionProp name="HeaderManager.headers">
-            <elementProp name="" elementType="Header">
-              <stringProp name="Header.name">Accept</stringProp>
-              <stringProp name="Header.value">application/json, text/plain, */*</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="Header">
-              <stringProp name="Header.name">Content-Type</stringProp>
-              <stringProp name="Header.value">application/json</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="Header">
-              <stringProp name="Header.name">charset</stringProp>
-              <stringProp name="Header.value">UTF-8</stringProp>
-            </elementProp>
-          </collectionProp>
-        </HeaderManager>
-        <hashTree/>
-      </hashTree>
-      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-审批（instanceId）" enabled="false">
-        <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-        <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-          <collectionProp name="Arguments.arguments">
-            <elementProp name="" elementType="HTTPArgument">
-              <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">{&#xd;
-	&quot;instanceId&quot;: &quot;7083fe77-5bc7-11eb-805c-dc4a3e8b7b0b&quot;,&#xd;
-	&quot;variables&quot;: {&#xd;
-		&quot;approve&quot;: &quot;1&quot;,&#xd;
-		&quot;userId&quot;: &quot;2&quot;&#xd;
-	}&#xd;
-}</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
-          </collectionProp>
-        </elementProp>
-        <stringProp name="HTTPSampler.domain">localhost</stringProp>
-        <stringProp name="HTTPSampler.port">9200</stringProp>
-        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-        <stringProp name="HTTPSampler.response_timeout"></stringProp>
-        <stringProp name="HTTPSampler.protocol"></stringProp>
-        <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
-        <stringProp name="HTTPSampler.path">/common/handleByInstanceId</stringProp>
         <stringProp name="HTTPSampler.method">POST</stringProp>
         <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
         <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -626,7 +609,7 @@
           <collectionProp name="Arguments.arguments">
             <elementProp name="userId" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">2</stringProp>
+              <stringProp name="Argument.value">3</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">userId</stringProp>
@@ -684,6 +667,34 @@
         <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
       </HTTPSamplerProxy>
       <hashTree/>
+      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-查看我相关所有任务" enabled="false">
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="userId" elementType="HTTPArgument">
+              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+              <stringProp name="Argument.value">4</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+              <boolProp name="HTTPArgument.use_equals">true</boolProp>
+              <stringProp name="Argument.name">userId</stringProp>
+            </elementProp>
+          </collectionProp>
+        </elementProp>
+        <stringProp name="HTTPSampler.domain">localhost</stringProp>
+        <stringProp name="HTTPSampler.port">9200</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+        <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        <stringProp name="HTTPSampler.protocol"></stringProp>
+        <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+        <stringProp name="HTTPSampler.path">/common/queryUserAllTask</stringProp>
+        <stringProp name="HTTPSampler.method">POST</stringProp>
+        <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+        <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+        <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+        <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+        <boolProp name="HTTPSampler.monitor">false</boolProp>
+        <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+      </HTTPSamplerProxy>
+      <hashTree/>
       <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-查看我创建的任务" enabled="false">
         <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量" enabled="true">
           <collectionProp name="Arguments.arguments">
@@ -712,61 +723,33 @@
         <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
       </HTTPSamplerProxy>
       <hashTree/>
-      <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-查看流程所有用户任务" enabled="false">
-        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量" enabled="true">
-          <collectionProp name="Arguments.arguments">
-            <elementProp name="instanceId" elementType="HTTPArgument">
-              <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">979e2b17-5eec-11eb-b233-dc4a3e8b7b0b</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-              <boolProp name="HTTPArgument.use_equals">true</boolProp>
-              <stringProp name="Argument.name">instanceId</stringProp>
-            </elementProp>
-          </collectionProp>
-        </elementProp>
-        <stringProp name="HTTPSampler.domain">localhost</stringProp>
-        <stringProp name="HTTPSampler.port">9200</stringProp>
-        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-        <stringProp name="HTTPSampler.response_timeout"></stringProp>
-        <stringProp name="HTTPSampler.protocol"></stringProp>
-        <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-        <stringProp name="HTTPSampler.path">/common/queryInstanceTask</stringProp>
-        <stringProp name="HTTPSampler.method">POST</stringProp>
-        <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-        <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-        <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-        <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-        <boolProp name="HTTPSampler.monitor">false</boolProp>
-        <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-      </HTTPSamplerProxy>
-      <hashTree/>
       <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="flowable-test3-创建用户组" enabled="false">
         <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="用户定义的变量" enabled="true">
           <collectionProp name="Arguments.arguments">
             <elementProp name="userId" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">3</stringProp>
+              <stringProp name="Argument.value">4</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">userId</stringProp>
             </elementProp>
             <elementProp name="userName" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">王五</stringProp>
+              <stringProp name="Argument.value">刘六</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">userName</stringProp>
             </elementProp>
             <elementProp name="groupId" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">manager03</stringProp>
+              <stringProp name="Argument.value">manager04</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">groupId</stringProp>
             </elementProp>
             <elementProp name="groupName" elementType="HTTPArgument">
               <boolProp name="HTTPArgument.always_encode">false</boolProp>
-              <stringProp name="Argument.value">管理组03</stringProp>
+              <stringProp name="Argument.value">管理组04</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
               <boolProp name="HTTPArgument.use_equals">true</boolProp>
               <stringProp name="Argument.name">groupName</stringProp>

@@ -12,6 +12,7 @@ import java.util.Map;
 @Data
 public class ProcessStartParam {
     private String processInstanceKey;
+    private String businessKey;
     private Map<String,Object> variables;
     private String createUserId;
 }

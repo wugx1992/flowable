@@ -24,6 +24,7 @@ public class ApproveHandleDelegate implements JavaDelegate {
             Map<String, Object> variables = execution.getVariables();
             log.info("variableInstances：{}", objectMapper.writeValueAsString(variableInstances));
             log.info("variables：{}", objectMapper.writeValueAsString(variables));
+
         }catch (Exception e){
             e.printStackTrace();
         }

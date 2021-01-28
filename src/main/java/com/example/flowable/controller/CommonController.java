@@ -17,22 +17,26 @@ import org.flowable.engine.*;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
+import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.example.flowable.dto.Process;
@@ -68,6 +72,14 @@ public class CommonController {
     @Autowired
     SystemDao systemDao;
 
+    @PostConstruct
+    public void initEventLog(){
+        //开启日志
+        EventLogger databaseEventLogger = new EventLogger(processEngine.getProcessEngineConfiguration().getClock(),
+                processEngine.getProcessEngineConfiguration().getObjectMapper());
+        runtimeService.addEventListener(databaseEventLogger);
+    }
+
     /**
      * 创建审批
      *
@@ -76,10 +88,11 @@ public class CommonController {
      */
     @RequestMapping("/start")
     public ResultVo startFlow(@RequestBody ProcessStartParam param) {
+
         log.info("创建审批参数：{}", param);
         Authentication.setAuthenticatedUserId(param.getCreateUserId());
         ProcessInstance processInstance =
-                runtimeService.startProcessInstanceByKey(param.getProcessInstanceKey(), param.getVariables());
+                runtimeService.startProcessInstanceByKey(param.getProcessInstanceKey(), param.getBusinessKey(), param.getVariables());
         String processId = processInstance.getId();
         String name = processInstance.getProcessDefinitionName();
 
@@ -99,13 +112,12 @@ public class CommonController {
      */
     @RequestMapping("/getTasks")
     public ResultVo getTasks(String userId, String groupId) {
-        TaskQuery query = taskService.createTaskQuery();
-        if(!StringUtils.isEmpty(userId) && StringUtils.isEmpty(groupId)){
+        TaskQuery query = taskService.createTaskQuery().or();
+        if(!StringUtils.isEmpty(userId) ){
             query.taskAssignee(userId);
-        }else if(StringUtils.isEmpty(userId) && !StringUtils.isEmpty(groupId)){
+        }
+        if(!StringUtils.isEmpty(groupId)){
             query.taskCandidateGroup(groupId);
-        }else if(!StringUtils.isEmpty(userId) && !StringUtils.isEmpty(groupId)){
-            query.or().taskAssignee(userId).taskCandidateGroup(groupId);
         }
 
         List<Task> tasks = query.orderByTaskCreateTime().desc().list();
@@ -141,33 +153,36 @@ public class CommonController {
     @RequestMapping("/handle")
     public ResultVo handle(@RequestBody ProcessHandleParam param) {
         log.info("提交审批参数：{}", param);
-        //判断是否有权限
+        //TODO 判断是否有权限
 //        boolean hadPermission = isAssigneeOrCandidate(userId, param.getTaskId());
         Task task = taskService.createTaskQuery().taskId(param.getTaskId()).singleResult();
         if (task == null) {
             return ResultVo.error("流程不存在");
         }
+//        任务局部变量
+//        taskService.setVariables(task.getId(), param.getVariables());
         taskService.complete(param.getTaskId(), param.getVariables());
         ResultVo result = ResultVo.ok("提交成功！");
         log.info("返回：{}", result);
         return result;
     }
 
-    /**
-     * 提交审批
-     */
-    @RequestMapping("/handleByInstanceId")
-    public ResultVo handleByInstanceId(@RequestBody ProcessHandleByInstanceIdParam param) {
-        log.info("提交审批参数：{}", param);
-        Task task = taskService.createTaskQuery().processInstanceId(param.getInstanceId()).singleResult();
-        if (task == null) {
-            return ResultVo.error("流程不存在");
-        }
-        taskService.complete(task.getId(), param.getVariables());
-        ResultVo result = ResultVo.ok("提交成功！");
-        log.info("返回：{}", result);
-        return result;
-    }
+
+//    /**
+//     * 提交审批
+//     */
+//    @RequestMapping("/handleByInstanceId")
+//    public ResultVo handleByInstanceId(@RequestBody ProcessHandleByInstanceIdParam param) {
+//        log.info("提交审批参数：{}", param);
+//        Task task = taskService.createTaskQuery().processInstanceId(param.getInstanceId()).singleResult();
+//        if (task == null) {
+//            return ResultVo.error("流程不存在");
+//        }
+//        taskService.complete(task.getId(), param.getVariables());
+//        ResultVo result = ResultVo.ok("提交成功！");
+//        log.info("返回：{}", result);
+//        return result;
+//    }
 
     /**
      * 生成流程图
@@ -282,6 +297,8 @@ public class CommonController {
      */
     @RequestMapping("/queryFinishTask")
     public void queryFinishTask(String userId, String amount) throws JsonProcessingException {
+
+        List<String> groups = identityService.createGroupQuery().groupMember(userId).list().stream().map(group -> group.getId()).collect(Collectors.toList());
         List<HistoricActivityInstance> activeList;
         // 如果不需要筛选自定义参数
         if (StringUtils.isEmpty(amount)) {
@@ -335,6 +352,60 @@ public class CommonController {
         }
     }
 
+    /**
+     * 查看我相关所有任务
+     */
+    @RequestMapping("/queryUserAllTask")
+    public void queryUserAllTask(String userId) {
+        Set<String> groups = identityService.createGroupQuery().groupMember(userId).list().stream().map(group -> group.getId()).collect(Collectors.toSet());
+        log.info("用户：{}，包含组：{}", userId, groups);
+        // 我审批的（我或者我的组）
+        HistoricProcessInstanceQuery instanceQuery = historyService.createHistoricProcessInstanceQuery().or().involvedUser(userId);
+        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery().or().taskInvolvedUser(userId);
+        if(groups.size()!=0){
+            instanceQuery.involvedGroups(groups);
+            taskQuery.taskInvolvedGroups(groups);
+        }
+
+        log.info("################# 所有我相关进程（有部分不能查询出来，可能是使用group组的方式） ###################");
+        instanceQuery.orderByProcessInstanceEndTime().desc().list().forEach(h -> {
+            log.info("进程ID：{}，name：{}", h.getId(), h.getProcessDefinitionName());
+        });
+
+        log.info("################# 所有我相关任务 ###################");
+        taskQuery.orderByHistoricTaskInstanceStartTime().desc().list().forEach(task->{
+            Map<String, Object> params = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId()).list()
+                    // 拿到的是HistoricVariableInstance对象，需要转成原来存储的方式
+                    .stream().collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
+
+            log.info("进程ID：{}，任务ID：{}，name：{}，Variable：{}", task.getProcessInstanceId(), task.getId(), task.getName(), params);
+        });
+    }
+
+    /**
+     * 查看流程详情
+     */
+    @RequestMapping("/queryInstanceDetail")
+    public void queryInstanceDetail(String instanceId) {
+        historyService.createHistoricVariableInstanceQuery().processInstanceId(instanceId).list().stream().forEach(action->{
+            log.info("进程参数：key-value: {} ：{} ，scopeType：{}， taskId：{}", action.getVariableName(), action.getValue(), action.getScopeType(), action.getTaskId());
+        });
+        log.info("################# 进程所有相关任务 ###################");
+        historyService.createHistoricTaskInstanceQuery().processInstanceId(instanceId).orderByHistoricTaskInstanceStartTime().asc().list().forEach(task->{
+            Map<String, Object> params = historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).list()
+                    .stream().collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
+
+            log.info("任务id：{}，名称：{}，创建时间：{}，直接指派：{}, 任务参数：{}", task.getId(), task.getName(), task.getCreateTime(), task.getAssignee(), params);
+        });
+
+        log.info("################# 进程所有相关任务日志 ###################");
+        historyService.createHistoricTaskLogEntryQuery().processInstanceId(instanceId).orderByTimeStamp().asc().list().forEach(action->{
+            log.info("操作记录：{}", action);
+
+        });
+    }
+
 
     /**
      * 查看我创建的任务
@@ -359,20 +430,6 @@ public class CommonController {
         }
     }
 
-
-
-    /**
-     * 查看流程所有用户任务
-     */
-    @RequestMapping("/queryInstanceTask")
-    public void queryInstanceTask(String instanceId) throws JsonProcessingException {
-        List<Task> list = taskService.createTaskQuery().processInstanceId(instanceId).list();
-        log.info("查得结果：{}", list.size());
-        ObjectMapper objectMapper = new ObjectMapper();
-        for (Task item : list) {
-            log.info("任务：{}", objectMapper.writeValueAsString(item));
-        }
-    }
 
 
     /**

@@ -68,7 +68,7 @@ public class Process implements Serializable {
     }
 
     public Process withVariables(Map<String, Object> variables){
-        System.out.println("withVariables："+variables);
+//        System.out.println("withVariables："+variables);
         params = variables;
 //        this.params = JSON.parseObject((String) variables.get(FlowUtil.AUDIT_PARAMS_KEY));
 //        this.fromUserName = FlowUtil.getFromUserName(variables);
